@@ -45,7 +45,9 @@ class AiClient {
         .timeout(const Duration(seconds: 20));
 
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw AiClientException('AI API 回應失敗：HTTP ${response.statusCode}');
+      throw AiClientException(
+        'AI API 回應失敗：HTTP ${response.statusCode}，${_errorMessage(response.body)}',
+      );
     }
 
     final decoded = jsonDecode(utf8.decode(response.bodyBytes));
@@ -79,6 +81,31 @@ class AiClient {
       }
     }
     return null;
+  }
+
+  String _errorMessage(String body) {
+    try {
+      final decoded = jsonDecode(body);
+      if (decoded is Map<String, dynamic>) {
+        final error = decoded['error'];
+        if (error is Map<String, dynamic> && error['message'] is String) {
+          return error['message'] as String;
+        }
+        if (error is String) {
+          return error;
+        }
+        if (decoded['message'] is String) {
+          return decoded['message'] as String;
+        }
+      }
+    } on FormatException {
+      // Fall through to the raw body summary below.
+    }
+    final compact = body.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (compact.isEmpty) {
+      return '沒有錯誤本文。';
+    }
+    return compact.length > 160 ? '${compact.substring(0, 160)}...' : compact;
   }
 }
 

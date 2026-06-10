@@ -110,6 +110,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _endpointController,
+                    keyboardType: TextInputType.url,
+                    textCapitalization: TextCapitalization.none,
+                    autocorrect: false,
+                    enableSuggestions: false,
                     decoration: const InputDecoration(
                       labelText: 'API URL',
                       helperText:
@@ -133,6 +137,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   TextFormField(
                     controller: _apiKeyController,
                     obscureText: _obscureKey,
+                    keyboardType: TextInputType.visiblePassword,
+                    textCapitalization: TextCapitalization.none,
+                    autocorrect: false,
+                    enableSuggestions: false,
                     decoration: InputDecoration(
                       labelText: 'API Key',
                       helperText: '只儲存在本機 SharedPreferences，不會送到後端。',
@@ -153,6 +161,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _modelController,
+                    keyboardType: TextInputType.visiblePassword,
+                    textCapitalization: TextCapitalization.none,
+                    autocorrect: false,
+                    enableSuggestions: false,
                     decoration: const InputDecoration(
                       labelText: '模型名稱',
                       helperText: '依你的 API 供應商填寫；空白時使用 App 預設值。',
@@ -244,9 +256,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         enabled: _enabled,
         endpoint: _endpointController.text.trim(),
         apiKey: _apiKeyController.text.trim(),
-        model: _modelController.text.trim().isEmpty
-            ? 'gpt-4.1-mini'
-            : _modelController.text.trim(),
+        model: _normalizeModelName(_modelController.text),
       ),
     );
     if (mounted) {
@@ -254,5 +264,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         context,
       ).showSnackBar(const SnackBar(content: Text('設定已儲存在本機。')));
     }
+  }
+
+  String _normalizeModelName(String value) {
+    final model = value.trim();
+    if (model.isEmpty) {
+      return 'gpt-4.1-mini';
+    }
+    if (model.toLowerCase().startsWith('gemini-')) {
+      return model.toLowerCase();
+    }
+    return model;
   }
 }

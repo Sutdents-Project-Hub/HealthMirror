@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
 import '../main.dart';
 import '../widgets/metric_card.dart';
@@ -181,7 +182,24 @@ class _AiInsightCard extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             if (insight != null)
-              Text(insight!, style: theme.textTheme.bodyLarge)
+              MarkdownBody(
+                data: insight!,
+                selectable: true,
+                softLineBreak: true,
+                styleSheet: MarkdownStyleSheet.fromTheme(theme).copyWith(
+                  p: theme.textTheme.bodyLarge?.copyWith(height: 1.55),
+                  strong: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                  listBullet: theme.textTheme.bodyLarge?.copyWith(
+                    height: 1.55,
+                    color: scheme.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  blockSpacing: 10,
+                  listIndent: 24,
+                ),
+              )
             else if (error != null)
               Text(
                 error!,
